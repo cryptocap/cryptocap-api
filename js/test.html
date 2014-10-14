@@ -1,0 +1,98 @@
+<html>
+<script src="bitcoinjs-min.js"></script>
+<script src="//brainwallet.github.io/js/bitcoinsig.js"></script>
+<script>
+// Bitcoin Key
+var secret = '5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss';
+
+// Sets up API Websocket
+var attempts = 1, timer = 0;
+connectAPI();
+
+function connectAPI () {
+  api = new WebSocket('wss://api.cryptocapital.co');
+
+  api.onopen = function () {
+    console.log('Connected to wss://api.cryptocapital.co');
+    attempts = 1;
+  };
+  
+  api.onmessage = function (msg) {
+    parseAPI(msg);
+  };
+
+  api.onclose = function () {
+    console.log('Disconnected from wss://api.cryptocapital.co');
+    var time = generateInterval(attempts);
+    setTimeout(function () { attempts++; connectAPI(); }, time);
+  };
+}
+
+function generateInterval (k) {
+  var maxInterval = (Math.pow(2, k) - 1) * 1000;
+  if (maxInterval > 30*1000) { maxInterval = 30*1000; }
+  return Math.random() * maxInterval;
+}
+
+function parseAPI(msg) {
+  var data = JSON.parse(msg.data);
+  
+  // Authentication Challenge 
+  if (data.msg == 'challenge') {
+    console.log(JSON.stringify(data));
+    var msg = data.data;
+    var key = bitcoin.ECKey.fromWIF(secret);
+    var pub = key.pub.getAddress().toString();
+    var sig = bitcoin.Message.sign(key, msg).toString('base64');
+    console.log(JSON.stringify({'op':'auth','params':{'key':pub,'signature':sig}}, undefined, 2));
+    api.send(JSON.stringify({'op':'auth','params':{'key':pub,'signature':sig}}));
+  }
+
+  // Authentication Success
+  if (data.msg == 'auth') {
+    console.log(JSON.stringify(data));
+
+    var op = {'op':'register','nonce':1,'params':{'name':'Bob Smith','email':'bob@smith.com', 'country':'PA', 'currency':'USD'}};
+    console.log(JSON.stringify(op));
+    api.send(JSON.stringify(op));
+    
+    var op = {'op':'getinfo','nonce':2};
+    console.log(JSON.stringify(op));
+    api.send(JSON.stringify(op));
+
+    var op = {'op':'setinfo','nonce':3, 'params':{'email':'test2@bob.com', 'country':'PA'}};
+    console.log(JSON.stringify(op));
+    api.send(JSON.stringify(op));
+
+    var op = {'op':'transfer','nonce':2,'params':{'destination':'1KEBzisAQSjwGvmBYAc2VyZnSXqftNEwzw','currency':'USD','amount':'1000.00'}};
+    api.send(JSON.stringify(op));
+
+    var op = {'op':'transfer','nonce':3,'params':{'destination':'1KEBzisAQSjwGvmBYAc2VyZnSXqftNEwzw','currency':'USD','amount':'1000.00'}};
+    api.send(JSON.stringify(op));
+    
+    var op = {'op':'transfer','nonce':4,'params':{'destination':'1Gokm82v6DmtwKEB8AiVhm82hyFSsEvBDK','currency':'USD','amount':'1000.00'}};
+    api.send(JSON.stringify(op));
+  }
+
+  // Transfer Notifications
+  if (data.msg == 'error') {
+    console.log(JSON.stringify(data));
+  }
+  if (data.msg == 'register') {
+    console.log(JSON.stringify(data));
+  }
+  if (data.msg == 'account') {
+    console.log(JSON.stringify(data));
+  }
+  if (data.msg == 'balance') {
+    console.log(JSON.stringify(data));
+  }
+  if (data.msg == 'transfer') {
+    console.log(JSON.stringify(data));
+  }
+}
+</script>
+</head>
+<body>
+</body>
+</html>
