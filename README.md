@@ -17,7 +17,7 @@ The Crypto Capital API is a Websocket API, which can be reached at `ws://api.cry
 Commands issued by the client to the server are referred to as Operations and have the basic structure:
 
 ```
-{ “op”: “<command>”, “nonce”: 12345, “params”: { … }}
+{  "op" : "<command>", "nonce": 12345, "params": { ... }}
 ```
 
 The nonce is an optional parameter that can allow the client to connect a response message to an operation. If a nonce is provided, the server will include it in the response.
@@ -25,7 +25,7 @@ The nonce is an optional parameter that can allow the client to connect a respon
 Messages and notifications sent from the server to the client have the basic structure:
 
 ```
-{ “msg”: “<type>”, “nonce”: 12345, “data”: { … }, “signed”: “...”}
+{ "msg": "<type>", "nonce": 12345, "data": { ... }, "signed": "..." }
 ```
 
 Certain types of server based notifications will be signed by the secured Crypto Capital back-office server using the Public Key `1AUTwMzqehYZVqKTvdkVwat4knMzMSkhYU` as an added security measure. The signature is a Bitcoin signature of the JSON encoded data object included in the message.
@@ -38,26 +38,26 @@ The authentication sequence is as follows:
 Connect to the API. You will receive a `challenge` message with a random, unique string. The message looks like:
 
 ```
-{"msg":"challenge","data":"tlgczpu91rw6zuxr"}
+{ "msg" : "challenge", "data" : "tlgczpu91rw6zuxr" }
 ```
 
 Using the private key associated with your account to sign the challenge message (only the data), and send the command:
 
 ```
-{ “op”: ”auth”, ”params”: { “key”: ”<your public key>”, ”signature”: ”<the signed message>” } }
+{ "op": "auth", "params": { "key": "<your public key>", "signature": "<the signed message>" } }
 ```
 
-If your signature is valid, you will receive an “auth” message:
+If your signature is valid, you will receive an "auth" message:
 
 ```
-{"msg":"auth","data":"User Authenticated"}
+{ "msg" : "auth", "data" : "User Authenticated" }
 ```
 
 Otherwise you will receive an `error` message explaining the problem.
 
 Once authenticated, the public address used will be kept as a session variable, and automatically included as a parameter for all operations that require it.
 
-Technically, any valid Bitcoin address can be used to authenticate. We do this to force new users to authenticate prior to registering an account. Only addresses associated with a registered account will be able to successfully execute any operations beyond registration. Also, for added security, the Public API servers operate “blind”. No user data (including public keys) is ever stored on the Public API server beyond the end of the session. All operations, once parsed and checked for validity, are passed through to the secured back-end server for processing. If the back-end server is offline, the operation will fail immediately and the user will be notified of the failure.
+Technically, any valid Bitcoin address can be used to authenticate. We do this to force new users to authenticate prior to registering an account. Only addresses associated with a registered account will be able to successfully execute any operations beyond registration. Also, for added security, the Public API servers operate "blind". No user data (including public keys) is ever stored on the Public API server beyond the end of the session. All operations, once parsed and checked for validity, are passed through to the secured back-end server for processing. If the back-end server is offline, the operation will fail immediately and the user will be notified of the failure.
 
 ## Registration
 Registering a new account with the Crypto Capital API is a 3-step process. Step one is authentication, described above. Step two is basic registration. Step three is providing KYC/AML information to get the account verified.
@@ -66,13 +66,13 @@ Basic registration involves issuing the `register` operation. Required parameter
 
 * `name` - Full legal name of the account holder (either a business or individual)
 * `email` - Email Address of the account holder
-* `country` - Country of Residence (use the two-letter identifier, eg. “PA”)
-* `currency` - Preferred Fiat Currency (use the three-letter identifier, eg. “USD”)
+* `country` - Country of Residence (use the two-letter identifier, eg. "PA")
+* `currency` - Preferred Fiat Currency (use the three-letter identifier, eg. "USD")
 
 Optional parameters are as follows:
 
-* `address` - Full street address (eg. “123 Main Street, Anytown, ST, 12345”)
-* `phone` - Phone number, including country code (eg. “+5071231234”)
+* `address` - Full street address (eg. "123 Main Street, Anytown, ST, 12345")
+* `phone` - Phone number, including country code (eg. "+5071231234")
 
 The server will respond with a `register` message in the event of a successful registration, or `error` message indicating the error.
 
@@ -88,22 +88,20 @@ A registered user can fetch his account details through the API by issuing the `
 * `phone` - Phone number of the account holder
 * `country` - Country of residence of the account holder
 * `currency` - Preferred Fiat currency of the account holder
+* `isRegistered` - True or False, depending on whether the account holder has been registered.
 * `isVerified` - True or False, depending on whether the account holder has completed Verification.
-* `iban` - IBAN number associated with the account - assigned once the account is verified.
+* `accounts` - Array of all accounts, including currency and balance.
 
 ### setinfo
 A registered user may update some of his account contact details through the API by issuing the `setinfo` operation. All of the following parameters are optional, and only those provided will be changed. Some changes, such as change of the residence of the country may require re-verification.
 
+* `name` - Name of the account holder
 * `email` - Email address of the account holder
 * `address` - Mailing address of the account holder
 * `phone` - Phone number of the account holder
 * `country` - Country of residence of the account holder
-* `currency` - Preferred Fiat currency of the account holder (using the 3 letter code, eg. “USD”)
 
 The server will respond with an `account` message containing the updated information.
-
-### balance
-A registered user can check the balance of his account by issuing the `balance` operation. He may optionally limit the results to a specific currency by providing the `currency` parameter. The server will respond with a `balance` message. The data will contain key/value pairs for the preferred fiat currency (regardless of the balance), as well as any other currency containing a non-zero balance.
 
 ### history
 A registered user can check transaction history of his account by issuing the `history` operation. He may optionally limit the results by providing either of the following parameters:
@@ -118,20 +116,20 @@ The server will respond to the `history` operation by sending a separate `transf
 ### transfer
 A registered user can transfer funds from his account to another user, or to an IBAN account number by issuing the `transfer` operation with the following parameters:
 
-* `destination` - the public address or IBAN account number of the recipient.
+* `recipient` - the public address or IBAN account number of the recipient.
 * `currency` - the fiat currency code of the funds to be transferred.
 * `amount` - the amount of funds to be transferred.
 
-Internal transfers are processed instantly. On a successful transfer, the server will send both the sender and recipient an identical `transfer` message with the following data:
+The server will respond by sending a `transfer` message to both the sender and recipient (if the recipient is another user). Containing the following details:
 
-* `txid` - Transaction ID
-* `timestamp` - the unix-epoch timestamp of the transfer
-* `sender` - the public address of the sender
-* `destination` - the public address of the recipient
+* `id` - Transaction ID
+* `dateCreated` - the unix-epoch timestamp that the transfer was initiated
+* `dateUpdated` - the unix-epoch timestamp that the transfer was last updated
+* `sender` - the public address or IBAN of the sender
+* `recipient` - the public address or IBAN of the recipient
 * `currency` - the fiat currency code of the funds transferred
 * `amount` - the amount of funds transferred
+* `isCompleted` - a True or False value indicating whether the transfer has been completed.
+* `isFailed` - a True or False value indicating whether the transfer completed successfully or failed.
 
-Transfers to IBAN accounts take longer to process. When submitted, the server will respond to the sender with a `transfer` message similar to the above, but with an additional `status` field set to `pending`. When the transfer is processed, a followup `transfer` message will be issued to the sender with the `status` set to either `complete` or `failed`. If the transfer failed, a `message` field will contain a description of the reason the transfer failed.
-
-Deposits from IBAN accounts will trigger a `transfer` message to be sent to the user. The `sender` field will show the IBAN account the originated the deposit.
-
+While transfers are being processed, the sender and recipients may receive multiple updates in the form of additional `transfer` messages. If the transfer affects the balance of an account, the recipient will also receive an `account` message updating the balances of the accounts.
