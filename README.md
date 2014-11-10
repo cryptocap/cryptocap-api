@@ -44,13 +44,7 @@ Connect to the API. You will receive a `challenge` message with a random, unique
 Using the private key associated with your account to sign the challenge message (only the data), and send the command:
 
 ```
-{
-  “op”: ”auth”, 
-  ”params”: { 
-    “key”: ”<your public key>”, 
-    ”signature”: ”<the signed message>”
-  }
-}
+{ “op”: ”auth”, ”params”: { “key”: ”<your public key>”, ”signature”: ”<the signed message>” } }
 ```
 
 If your signature is valid, you will receive an “auth” message:
