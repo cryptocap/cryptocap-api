@@ -1,7 +1,10 @@
 <html>
 <script src="bitcoinjs-min.js"></script>
 <script src="//brainwallet.github.io/js/bitcoinsig.js"></script>
+</head>
+<body>
 <script>
+
 // Bitcoin Key
 var secret = '5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss';
 
@@ -10,10 +13,16 @@ var attempts = 1, timer = 0;
 connectAPI();
 
 function connectAPI () {
-  api = new WebSocket('wss://api.cryptocapital.co');
+
+  url = 'wss://api.cryptocapital.co';
+
+  api = new WebSocket(url);
 
   api.onopen = function () {
-    console.log('Connected to wss://api.cryptocapital.co');
+    document.writeln('<h1>Crypto Capital API Test Rig</h1>');
+    document.writeln('<p>This test rig will demonstrate connecting to and running a few operations on on the Crypto Capital API. Because of the asynchronous nature of the API, responses to some operations may be received in a different order than those of the operations.</p>');
+    document.writeln('<hr/>');
+    document.writeln('<p>Connected to ' + url + '</p>');
     attempts = 1;
   };
   
@@ -22,7 +31,7 @@ function connectAPI () {
   };
 
   api.onclose = function () {
-    console.log('Disconnected from wss://api.cryptocapital.co');
+    document.writeln('<p>Disconnected from ' + url + '</p>');
     var time = generateInterval(attempts);
     setTimeout(function () { attempts++; connectAPI(); }, time);
   };
@@ -39,60 +48,72 @@ function parseAPI(msg) {
   
   // Authentication Challenge 
   if (data.msg == 'challenge') {
-    console.log(JSON.stringify(data));
+    document.writeln('<p>Received Challenge Message</p>');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
     var msg = data.data;
     var key = bitcoin.ECKey.fromWIF(secret);
     var pub = key.pub.getAddress().toString();
     var sig = bitcoin.Message.sign(key, msg).toString('base64');
-    console.log(JSON.stringify({'op':'auth','params':{'key':pub,'signature':sig}}, undefined, 2));
+
+    document.writeln('<p><p>Sending Authentication Operation</p></p>');
+    document.writeln('<pre>' + JSON.stringify({'op':'auth','params':{'key':pub,'signature':sig}}) + '</pre>');
     api.send(JSON.stringify({'op':'auth','params':{'key':pub,'signature':sig}}));
   }
 
   // Authentication Success
   if (data.msg == 'auth') {
-    console.log(JSON.stringify(data));
+    document.writeln('<p>Received Authentication Message</p>');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
 
-    var op = {'op':'register','nonce':1,'params':{'name':'Bob Smith','email':'bob@smith.com', 'country':'PA', 'currency':'USD'}};
-    console.log(JSON.stringify(op));
+    // Register as a User
+    document.writeln('<p>Sending Registration Operation</p>');
+    var op = {'op':'register','nonce':1,'params':{'name':'Bob Smith','email':'bob@smith.com', 'country':'PA', 'currency':'PAB'}};
+    document.writeln('<pre>' + JSON.stringify(op) + '</pre>');
     api.send(JSON.stringify(op));
     
+    // Get information about myself
+    document.writeln('<p>Sending GetInfo Operation</p>');
     var op = {'op':'getinfo','nonce':2};
-    console.log(JSON.stringify(op));
+    document.writeln('<pre>' + JSON.stringify(op) + '</pre>');
     api.send(JSON.stringify(op));
 
+    // Update my information
+    document.writeln('<p>Sending SetInfo Operation</p>');
     var op = {'op':'setinfo','nonce':3, 'params':{'email':'test2@bob.com', 'country':'PA'}};
-    console.log(JSON.stringify(op));
+    document.writeln('<pre>' + JSON.stringify(op) + '</pre>');
     api.send(JSON.stringify(op));
 
-    var op = {'op':'transfer','nonce':2,'params':{'destination':'1KEBzisAQSjwGvmBYAc2VyZnSXqftNEwzw','currency':'USD','amount':'1000.00'}};
+    // Transfer funds to another user
+    document.writeln('<p>Sending Transfer Operation</p>');
+    var op = {'op':'transfer','nonce':4,'params':{'recipient':'13rgr7rzsKNMu1KUTJvKQGcYvCceP2PtAi','currency':'PAB','amount':'1000.00'}};
+    document.writeln('<pre>' + JSON.stringify(op) + '</pre>');
     api.send(JSON.stringify(op));
 
-    var op = {'op':'transfer','nonce':3,'params':{'destination':'1KEBzisAQSjwGvmBYAc2VyZnSXqftNEwzw','currency':'USD','amount':'1000.00'}};
-    api.send(JSON.stringify(op));
-    
-    var op = {'op':'transfer','nonce':4,'params':{'destination':'1Gokm82v6DmtwKEB8AiVhm82hyFSsEvBDK','currency':'USD','amount':'1000.00'}};
+    // Replay the last 2 messages
+    document.writeln('<p>Sending History Operation</p>');
+    var op = {'op':'history', 'params': {'limit': 2}};
+    document.writeln('<pre>' + JSON.stringify(op) + '</pre>');
     api.send(JSON.stringify(op));
   }
 
   // Transfer Notifications
   if (data.msg == 'error') {
-    console.log(JSON.stringify(data));
+    document.writeln('Received Error Message');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
   }
   if (data.msg == 'register') {
-    console.log(JSON.stringify(data));
+    document.writeln('Received Registration Confirmation Message');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
   }
   if (data.msg == 'account') {
-    console.log(JSON.stringify(data));
-  }
-  if (data.msg == 'balance') {
-    console.log(JSON.stringify(data));
+    document.writeln('Received Account Information Message');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
   }
   if (data.msg == 'transfer') {
-    console.log(JSON.stringify(data));
+    document.writeln('Received Transfer Notification Message');
+    document.writeln('<pre>' + JSON.stringify(data) + '</pre>');
   }
 }
 </script>
-</head>
-<body>
 </body>
 </html>
