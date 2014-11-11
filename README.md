@@ -12,7 +12,7 @@ An example operation/message flow operates as such:
 5. CCC sends a transfer status message to the customer and beneficiary, with the updated status.
 
 ## Connection
-The Crypto Capital API is a Websocket API, which can be reached at `ws://api.cryptocapital.co:8080`. No special headers or authentication is necessary to connect to the socket. All commands and messages are transmitted JSON encoded. 
+The Crypto Capital API is a Websocket API, which can be reached at `wss://api.cryptocapital.co`. No special headers or authentication is necessary to connect to the socket. All commands and messages are transmitted JSON encoded. 
 
 Commands issued by the client to the server are referred to as Operations and have the basic structure:
 
