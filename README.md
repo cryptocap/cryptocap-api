@@ -10,16 +10,16 @@ In order to associate a BitID with an account, is necessary to prove ownership o
 
 The registration accounts are as follows:
 
-| Currency | Account Number | Description                                   |
-|:--------:|:--------------:|-----------------------------------------------|
-|    USD   |   9120231592   | Crypto Capital Verification (Current Account) |
-|    EUR   |   9120231638   | Crypto Capital Verification (Current Account) |
-|    GBP   |   9120231677   | Crypto Capital Verification (Current Account) |
-|    CAD   |   9120231625   | Crypto Capital Verification (Current Account) |
-|    JPY   |   9120231773   | Crypto Capital Verification (Current Account) |
-|    CNY   |   9120231746   | Crypto Capital Verification (Current Account) |
-|    AUD   |   9120231731   | Crypto Capital Verification (Current Account) |
-|    PLN   |   9120231707   | Crypto Capital Verification (Current Account) |
+| Currency | Account Number | Account Name | Address     | Country |
+|:--------:|:--------------:|--------------|-------------|---------|
+|    USD   |   9120231592   | CCAPI        | Panama City | Panama  |
+|    EUR   |   9120231638   | CCAPI        | Panama City | Panama  |
+|    GBP   |   9120231677   | CCAPI        | Panama City | Panama  |
+|    CAD   |   9120231625   | CCAPI        | Panama City | Panama  |
+|    JPY   |   9120231773   | CCAPI        | Panama City | Panama  |
+|    CNY   |   9120231746   | CCAPI        | Panama City | Panama  |
+|    AUD   |   9120231731   | CCAPI        | Panama City | Panama  |
+|    PLN   |   9120231707   | CCAPI        | Panama City | Panama  |
 
 Funds sent to these accounts will be automatically reimbursed, as long as they are sent from an account in the same currency. Cross-currency transfers cannot be automatically reimbursed, and so we advise that in order to register an account in a different currency, you should contact Crypto Capital customer support and request that a registration account in your currency be created.
 
