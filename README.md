@@ -39,8 +39,8 @@ If an operation was successful, the client will eventually receive a message sig
 ### auth
 Once connecting to the socket.io server, a registered user should authenticate in order to begin receiving messages from the server related to his accounts.
 
-#### params
-* This operation has no params, and the params object should not be included in the signature.
+#### Parameters
+This operation has no params, and the params object should not be included in the signature.
 
 #### Sample Code
 ```javascript
@@ -55,7 +55,7 @@ socket.emit('auth', JSON.stringify(authdata));
 ### transfer
 To initiate a transfer between Crypto Capital accounts, the client should initiate a `transfer` operation. At this time, the API only supports same-currency transfers between Crypto Capital accounts.
 
-#### params
+#### Parameters
 * `accountNumber` - *string* - Account Number to send funds from (eg. `"9120231592"`)
 * `beneficiary` - *string* - Account Number to received the funds (eg. `"9120231592"`)
 * `currency` - *string* - Currency code of the sending account (eg. `"USD"`)
