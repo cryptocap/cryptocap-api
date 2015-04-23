@@ -109,7 +109,7 @@ The server will send a `transfer` response to the BitID associated with both the
 * `narrative` - Description of the transfer
 
 #### Response Signature
-The signature is a Base64 encoded SHA1SUM signature of the string:
+The signature is a Base64 encoded ECDSA (Bitcoin Message) signature of the string:
 
 ```javascript
 key + nonce + rcpt + JSONencode(params)
@@ -166,7 +166,7 @@ The server will send a `transfer` response to the BitID associated with both the
 The response params contains a `transactions` object which is an array of all transactions matching the filters specified. The transactions have the same parameters as the server response for an individual transfer.
 
 #### Response Signature
-The signature is a Base64 encoded SHA1SUM signature of the string:
+The signature is a Base64 encoded ECDSA (Bitcoin Message) signature of the string:
 
 ```javascript
 key + nonce + rcpt + JSONencode(params)
