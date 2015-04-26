@@ -4,9 +4,9 @@
 The Crypto Capital API is a Socket.io API, which can be reached at `https://api.cryptocapital.co`. No special headers or authentication is necessary to connect to the socket. All commands and messages are transmitted JSON encoded. 
 
 ## Account Registration
-The Crypto Capital API uses a system very similar to BitID for authentication. By supporting BitID style key-pair authentication, we do not need to store any passwords on our system. Instead, we store only the public address associated with registered accounts.  It thus becomes impossible for a hacker to steal user passwords, since we do not store it.  The public address also becomes a handy way to identify users, and is used throughout the system.
+The Crypto Capital API uses a system very similar to BitID for authentication. By supporting BitID style key-pair authentication, we do not need to store any passwords on our system. Instead, we store only the public address associated with registered accounts.  It thus becomes impossible for a hacker to steal user passwords, since we do not store them.  The public address also becomes a handy way to identify users, and is used throughout the API.
 
-In order to associate a BitID with an account, is necessary to prove ownership of that account. This is done by using the web interface of Crypto Capital to transfer 1.00 from the account to one of our registration accounts, setting the Narative of the transfer to the BitID to be associated with that account. It is necessary to do this for each individual account, which adds the benefit of having access to some accounts restricted and not available through the API.
+In order to associate a BitID with an account, is necessary to prove ownership of that account. This is done by using the [Crypto Capital banking platform UI](https://secure.cryptocapital.co) to transfer 1.00 from the account to one of our registration accounts, setting the Narative of the transfer to the BitID to be associated with that account. It is necessary to do this for each individual account, which adds the benefit of having access to some accounts restricted and not available through the API.
 
 The registration accounts are as follows:
 
