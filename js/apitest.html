@@ -1,0 +1,81 @@
+<html>
+<head>
+  <title>Crypto Capital API</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+  <script src="https://api.cryptocapital.co/js/bitcoinjs.min.js"></script>
+  <script>
+
+    // Load BitID from Secret Key
+    var bckey = bitcoin.ECKey.fromWIF('5KECstbvG3LvbcLEjh7qtcNfiyCiLgmzJagXztsoUiwbk5TDKax');
+    var bcpub = bckey.pub.getAddress().toString(); // 1BwGC4QMC1zcTk5iBNR3j989ES2HW9oTKW
+    console.log(bcpub);
+
+    // Connect to API Server
+    var socket = io.connect("https://api.cryptocapital.co");
+    socket.on('connect', function () {
+
+        // Authenticate and Subscribe to Account Notifications
+        var authdata = { key : bcpub, nonce : Date.now() };
+        authdata.signed = bitcoin.Message.sign(bckey, authdata.key + authdata.nonce).toString('base64');
+        console.log('auth: %s', JSON.stringify(authdata));
+        socket.emit('auth', JSON.stringify(authdata));
+
+        // Transfer $1.00 from Account # 9120000001 to # 912000002
+        var txparams = { accountNumber : "9120000001", 
+                         beneficiary : "9120000002", 
+                         currency : 'USD', 
+                         amount : 1.00, 
+                         narrative : "Test API Transfer" };
+        var txdata = { key : bcpub, nonce : Date.now(), params : txparams };
+        txdata.signed = bitcoin.Message.sign(bckey, txdata.key + txdata.nonce + JSON.stringify(txdata.params)).toString('base64');
+        console.log('transfer: %s', JSON.stringify(txdata));
+        socket.emit('transfer', JSON.stringify(txdata));
+
+        // Ping the API Server every 30 seconds
+        var ping = setInterval( function () { 
+           var pingdata = { key : bcpub, nonce : Date.now() };
+           //var pingdata = { key : bcpub, nonce : 5 }; // Uncomment this to test invalid nonce
+           pingdata.signed = bitcoin.Message.sign(bckey, pingdata.key + pingdata.nonce).toString('base64'); 
+           console.log('ping: %s', JSON.stringify(pingdata));
+           socket.emit('ping', JSON.stringify(pingdata)); 
+        }, 30000 );
+
+        // Request an Account Statement from 4/20/2015 to now
+        var reqparams = { accountId : "9120000001", 
+                          fromTime : "1429488000" };
+        var req = { key : bcpub, nonce : Date.now(), params : reqparams };
+        req.signed = bitcoin.Message.sign(bckey, req.key + req.nonce + JSON.stringify(req.params)).toString('base64');
+        console.log('statement: %s', JSON.stringify(req));
+        socket.emit('statement', JSON.stringify(req));
+
+    });
+
+    // Listen for Ack messages
+    socket.on('ack', function (data) {
+        console.log('ack: %s', JSON.stringify(data));
+    });
+
+    // Listen for Error messages
+    socket.on('err', function (data) {
+        console.log('err: %s', JSON.stringify(data));
+    });
+
+    // Listen for Transfer Notifications
+    socket.on('transfer', function (data) {
+        console.log('transfer notification: %s', data);
+    });
+
+    // Listen for Account Statements
+    socket.on('statement', function (data) {
+        console.log('statement response: %s', data);
+    });
+
+  </script>
+</head>
+<body>
+  <h1>Crypto Capital API</h1>
+  <h2>Test Script</h2>
+  <p>Use your browser's Javascript console to watch activity from the included test code. Be sure to update the 
+     source code to use your registered BitID and your accounts.</p>
+</body>
+</html>
