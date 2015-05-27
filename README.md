@@ -82,7 +82,7 @@ To initiate a transfer between Crypto Capital accounts, the client should initia
 #### Parameters
 * `accountNumber` - *string* - Account Number to send funds from (eg. `"9120231592"`)
 * `beneficiary` - *string* - Account Number to received the funds (eg. `"9120231592"`)
-* `currency` - *string* - Currency code of the sending account (eg. `"USD"`)
+* `currency` - *string* - Currency code of the sending or beneficiary account (eg. `"USD"`). Forex exchange rates will be automatically calculated and applied.
 * `amount` - *number* - Amount for the transfer (eg. `1.00`)
 * `narrative` - *string* - Descriptive narrative for the transfer (eg. `"Transaction #12345"`)
 
