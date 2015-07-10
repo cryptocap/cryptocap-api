@@ -195,3 +195,50 @@ socket.emit('statement', JSON.stringify(stdata));
 
 #### Server Response
 The server will respond to a `statement` request by sending a series of `transfer` responses, one for each transfer that matches the request filter. These messages will have the identical format as in the case of standard transfer notification.
+
+### account
+A registered user can check the balance of his account by issuing the `account` operation.
+
+#### Parameters
+* `accountNumber` - *string* - Account number to query
+
+#### Sample Code
+```javascript
+var acctparams = { accountNumber : "9120000001" };
+var acctdata = { apiVersion : 2, key : ccpub, nonce : Date.now(), params : acctparams };
+acctdata.signed = doSign(cckey, 'ACCOUNT' + acctdata.key.toString() + acctdata.nonce.toString() + acctdata.params.accountNumber.toString());
+socket.emit('account', JSON.stringify(stdata));
+```
+
+#### Server Response
+The server will respond to an `account` request by sending an `account` response:
+
+```json
+{
+  "key" : "BLmiS8rOACxx3WQfZp/xXyeqjtyrJE6VhMN4gVtpu/RQioE38MXYWxlRF4ONIYI2l9npoSXK1gVcyoB2+VRima0=",
+  "nonce" : 1429815032196,
+  "rcpt" : "RecipientKey=",
+  "params" : {
+    "accountNumber" : "9120000001",
+    "name" : "Current Account",
+    "currency" : "USD",
+    "balance" : "100.00",
+    "available" : "100.00"
+  },
+  "signed" : "HHtq7HXqWx1Pi754iAhWWSugJOlmiNrZxrvfui6Y3mPxK1y5ayvJu+3vF2zR9DjIi0XwAouGhLdjHtFii8RlilM="
+}
+```
+
+#### Response Params
+* `accountNumber` - Account Number
+* `name` - Descriptive name of the account.
+* `currency` - Currency of the account.
+* `balance` - Balance of the account.
+* `available` - Available funds on the account
+
+#### Response Signature
+The signature is a Base64 encoded signature of the string:
+
+```
+'ACCOUNT' + <key> + <nonce> + <rcpt> + <params.accountNumber> + <params.name> + <params.currency> + <params.balance> + <params.available> 
+```
