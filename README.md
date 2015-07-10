@@ -105,8 +105,8 @@ txdata.signed = doSign(cckey, 'TRANSFER' + txdata.key.toString() + txdata.nonce.
 socket.emit('transfer', JSON.stringify(txdata));
 ```
 
-#### Server Response
-The server will send a `transfer` response to the BitID associated with both the sender and recipient of a successful transfer. It will have the following format:
+#### Server Response - Success
+On a successful transfer, the server will send a `transfer` response to the BitID associated with both the sender and recipient of a successful transfer. It will have the following format:
 
 ```json
 { 
@@ -144,6 +144,33 @@ The signature is a Base64 encoded signature of the string:
 
 ```
 'TRANSFER' + <key> + <rcpt> + <nonce> + <id> + <date> + <sendAccount> + <receiveAccount> + <sendCurrency> + <receiveCurrency> + <sendAmount> + <receiveAmount> + <narrative>
+```
+
+#### Server Response - Failure
+On a failed transfer, the server will send a `error` response to the BitID associated with the sender. It will have the following format:
+
+```json
+{ 
+  "key" : "BLmiS8rOACxx3WQfZp/xXyeqjtyrJE6VhMN4gVtpu/RQioE38MXYWxlRF4ONIYI2l9npoSXK1gVcyoB2+VRima0=",
+  "nonce" : 1429815032196,
+  "rcpt" : "RecipientKey=",
+  "params" : { 
+    "nonce" : "4795",
+    "msg" : "Descriptive Error Message"
+  },
+  "signed" : "HHtq7HXqWx1Pi754iAhWWSugJOlmiNrZxrvfui6Y3mPxK1y5ayvJu+3vF2zR9DjIi0XwAouGhLdjHtFii8RlilM="
+}
+```
+
+#### Response Params
+* `nonce` - Nonce of the failed transfer request
+* `msg` - Descriptive message detailing the error.
+
+#### Response Signature
+The signature is a Base64 encoded signature of the string:
+
+```
+'ERROR' + <key> + <nonce> + <rcpt> + <params.nonce> + <params.msg>
 ```
 
 ### statement
