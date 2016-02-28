@@ -1,5 +1,7 @@
 # Crypto Capital - End-User API v2.3
 
+*__UPDATE__: There is a new [v3.x API](http://cryptocap.github.io/ccapi-v3-docs/) available. The update is not backwards compatible, hence the new documentation site. This v2 API will stay available until further notice.*
+
 ## Connection
 The Crypto Capital API is a Socket.io or Websockets API, which can be reached at `https://api.cryptocapital.co` or `https://api.cryptocapital.co/ws` respectively. No special headers or authentication are necessary to connect to the socket. All commands and messages are transmitted JSON encoded. 
 
